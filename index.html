@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Registration Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .main-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .card-header-custom {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .card-body {
+            padding: 30px;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-control {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #11998e;
+            box-shadow: 0 0 0 3px rgba(17, 153, 142, 0.1);
+        }
+        
+        .form-control.is-invalid {
+            border-color: #dc3545;
+        }
+        
+        .form-control.is-valid {
+            border-color: #198754;
+        }
+        
+        .btn-custom {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(17, 153, 142, 0.3);
+        }
+        
+        .method-toggle {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .method-btn {
+            padding: 8px 20px;
+            border: 2px solid #11998e;
+            background: transparent;
+            color: #11998e;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .method-btn.active {
+            background: #11998e;
+            color: white;
+        }
+        
+        .nav-tabs {
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            color: #666;
+            padding: 12px 20px;
+            font-weight: 500;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: #11998e;
+            border-bottom: 3px solid #11998e;
+            background: transparent;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .cookie-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        
+        .session-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-card">
+        <div class="card-header-custom">
+            <h3 class="mb-1">🔐 Login System</h3>
+            <p class="mb-0">Form Processing with GET/POST</p>
+        </div>
+        
+        <div class="card-body">
+            <!-- Method Toggle -->
+            <div class="method-toggle">
+                <button class="method-btn active" id="postBtn" onclick="setMethod('POST')">POST</button>
+                <button class="method-btn" id="getBtn" onclick="setMethod('GET')">GET</button>
+            </div>
+            
+            <!-- Tabs -->
+            <ul class="nav nav-tabs" id="authTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button">
+                        Login
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button">
+                        Register
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="authTabsContent">
+                <!-- Login Form -->
+                <div class="tab-pane fade show active" id="login" role="tabpanel">
+                    <div class="success-message" id="loginSuccess"></div>
+                    
+                    <form id="loginForm" onsubmit="handleLogin(event)">
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="loginEmail" placeholder="Enter your email" required>
+                            <div class="error-message" id="loginEmailError">Please enter a valid email</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password" required>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">Remember me (Cookie)</label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-custom">Login</button>
+                    </form>
+                    
+                    <div class="cookie-info mt-3" id="cookieInfo">
+                        <strong>Cookie Status:</strong> <span id="cookieStatus">No cookie set</span>
+                    </div>
+                    
+                    <div class="session-info mt-3" id="sessionInfo">
+                        <strong>Session Status:</strong> <span id="sessionStatus">Not logged in</span>
+                    </div>
+                </div>
+                
+                <!-- Register Form -->
+                <div class="tab-pane fade" id="register" role="tabpanel">
+                    <form id="registerForm" onsubmit="handleRegister(event)">
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="registerName" placeholder="Enter your name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="registerEmail" placeholder="Enter your email" required>
+                            <div class="error-message" id="registerEmailError">Please enter a valid email</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" id="registerPassword" placeholder="Create a password" required>
+                            <div class="form-text">Password must be at least 6 characters</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="registerConfirmPassword" placeholder="Confirm your password" required>
+                            <div class="error-message" id="passwordMatchError">Passwords do not match</div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-custom">Register</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentMethod = 'POST';
+        
+        function setMethod(method) {
+            currentMethod = method;
+            document.getElementById('postBtn').classList.toggle('active', method === 'POST');
+            document.getElementById('getBtn').classList.toggle('active', method === 'GET');
+        }
+        
+        // Email Validation
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        // Handle Login
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            // Validate Email
+            if (!validateEmail(email)) {
+                document.getElementById('loginEmail').classList.add('is-invalid');
+                return;
+            }
+            document.getElementById('loginEmail').classList.remove('is-invalid');
+            
+            // Simulate login processing
+            const loginData = { email, password, method: currentMethod };
+            
+            if (currentMethod === 'POST') {
+                console.log('POST Request:', loginData);
+                // In real scenario, data would be sent in request body
+            } else {
+                console.log('GET Request:', loginData);
+                // In real scenario, data would be in query string
+            }
+            
+            // Set cookie if remember me is checked
+            if (rememberMe) {
+                setCookie('username', email, 7);
+                document.getElementById('cookieStatus').textContent = 'Cookie set for 7 days';
+            }
+            
+            // Set session
+            setSession('user', email);
+            document.getElementById('sessionStatus').textContent = 'Logged in as ' + email;
+            
+            // Show success message
+            const successMsg = document.getElementById('loginSuccess');
+            successMsg.textContent = `Login successful! Method: ${currentMethod}`;
+            successMsg.style.display = 'block';
+            
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Handle Registration
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            // Validate Email
+            if (!validateEmail(email)) {
+                document.getElementById('registerEmail').classList.add('is-invalid');
+                return;
+            }
+            document.getElementById('registerEmail').classList.remove('is-invalid');
+            
+            // Validate Password
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters');
+                return;
+            }
+            
+            // Check password match
+            if (password !== confirmPassword) {
+                document.getElementById('registerConfirmPassword').classList.add('is-invalid');
+                document.getElementById('passwordMatchError').style.display = 'block';
+                return;
+            }
+            document.getElementById('registerConfirmPassword').classList.remove('is-invalid');
+            document.getElementById('passwordMatchError').style.display = 'none';
+            
+            // Simulate registration
+            const registerData = { name, email, password, method: currentMethod };
+            console.log('Registration Data (' + currentMethod + '):', registerData);
+            
+            alert('Registration successful! Please login.');
+            
+            // Switch to login tab
+            document.getElementById('login-tab').click();
+        }
+        
+        // Cookie Functions
+        function setCookie(name, value, days) {
+            const expires = new Date();
+            expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+            document.cookie = name + '=' + encodeURIComponent(value) + ';expires=' + expires.toUTCString() + ';path=/';
+        }
+        
+        function getCookie(name) {
+            const nameEQ = name + '=';
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+            }
+            return null;
+        }
+        
+        // Session Functions (using localStorage for demo)
+        function setSession(key, value) {
+            const sessionData = {
+                value: value,
+                timestamp: new Date().getTime()
+            };
+            localStorage.setItem(key, JSON.stringify(sessionData));
+        }
+        
+        function getSession(key) {
+            const data = localStorage.getItem(key);
+            if (data) {
+                const sessionData = JSON.parse(data);
+                // Check if session is expired (5 minutes)
+                const now = new Date().getTime();
+                if (now - sessionData.timestamp > 5 * 60 * 1000) {
+                    localStorage.removeItem(key);
+                    return null;
+                }
+                return sessionData.value;
+            }
+            return null;
+        }
+        
+        function destroySession(key) {
+            localStorage.removeItem(key);
+        }
+        
+        // Check for existing session on load
+        $(document).ready(function() {
+            const savedUser = getSession('user');
+            if (savedUser) {
+                document.getElementById('sessionStatus').textContent = 'Logged in as ' + savedUser;
+            }
+            
+            const savedCookie = getCookie('username');
+            if (savedCookie) {
+                document.getElementById('cookieStatus').textContent = 'Cookie found: ' + savedCookie;
+                document.getElementById('loginEmail').value = savedCookie;
+                document.getElementById('rememberMe').checked = true;
+            }
+        });
+    </script>
+</body>
+</html>
